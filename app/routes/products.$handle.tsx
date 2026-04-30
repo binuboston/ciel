@@ -1,42 +1,42 @@
-import {redirect, useLoaderData} from 'react-router';
-import type {Route} from './+types/products.$handle';
 import {
-  getSelectedProductOptions,
   Analytics,
-  useOptimisticVariant,
-  getProductOptions,
   getAdjacentAndFirstAvailableVariants,
+  getProductOptions,
+  getSelectedProductOptions,
+  useOptimisticVariant,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
-import {ProductForm} from '~/components/ProductForm';
+import {Truck, Undo2} from 'lucide-react';
+import {useLoaderData} from 'react-router';
+import {Container} from '~/components/layout/Container';
+import {Section} from '~/components/layout/Section';
+import {ScrollReveal} from '~/components/motion/ScrollReveal';
+import {ProductForm} from '~/components/product/ProductForm';
+import {ProductGallery} from '~/components/product/ProductGallery';
+import {ProductPrice} from '~/components/product/ProductPrice';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/Accordion';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import type {Route} from './+types/products.$handle';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const title = data?.product?.title ?? '';
   return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
-    },
+    {title: title ? `${title} — Ciel` : 'Product — Ciel'},
+    {rel: 'canonical', href: `/products/${data?.product?.handle ?? ''}`},
   ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const {handle} = params;
   const {storefront} = context;
@@ -49,77 +49,130 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
 
-  // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  return {
-    product,
-  };
+  return {product};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context, params}: Route.LoaderArgs) {
-  // Put any API calls that is not critical to be available on first page render
-  // For example: product reviews, product recommendations, social feeds.
-
+function loadDeferredData(_: Route.LoaderArgs) {
   return {};
 }
 
 export default function Product() {
   const {product} = useLoaderData<typeof loader>();
 
-  // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
   );
 
-  // Sets the search param to the selected variant without navigation
-  // only when no search params are set in the url
   useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
 
-  // Get the product options array
   const productOptions = getProductOptions({
     ...product,
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml} = product;
+  const {title, descriptionHtml, vendor} = product;
+
+  // Build a gallery: prefer the full images list, but always lead with the
+  // selected variant's image so changing color/size visibly reflects up top.
+  const galleryImages = (() => {
+    const all = product.images?.nodes ?? [];
+    const selected = selectedVariant?.image;
+    if (!selected) return all;
+    const filtered = all.filter((img: {id?: string | null}) => img && img.id !== selected.id);
+    return [selected, ...filtered];
+  })();
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
-      </div>
+    <>
+      <Section spacing="md">
+        <Container>
+          <div className="grid gap-8 md:grid-cols-2 md:gap-12 lg:gap-20">
+            <ProductGallery images={galleryImages} title={title} />
+
+            <ScrollReveal
+              as="div"
+              className="md:sticky md:top-24 md:self-start md:max-h-[calc(100vh-8rem)] md:overflow-y-auto"
+            >
+              <div className="flex flex-col gap-8">
+                <header className="flex flex-col gap-3">
+                  {vendor ? (
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
+                      {vendor}
+                    </span>
+                  ) : null}
+                  <h1 className="font-display text-[clamp(1.875rem,3.5vw,3rem)] font-bold leading-[1.05] tracking-[-0.02em]">
+                    {title}
+                  </h1>
+                  <div className="text-lg font-medium tabular-nums">
+                    <ProductPrice
+                      price={selectedVariant?.price}
+                      compareAtPrice={selectedVariant?.compareAtPrice}
+                    />
+                  </div>
+                </header>
+
+                <ProductForm
+                  productOptions={productOptions}
+                  selectedVariant={selectedVariant}
+                />
+
+                <ul className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-paper-warm)] p-5 text-sm">
+                  <li className="flex items-center gap-3">
+                    <Truck className="h-4 w-4 text-[var(--color-neutral-500)]" strokeWidth={1.6} />
+                    Free worldwide shipping over $150
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Undo2 className="h-4 w-4 text-[var(--color-neutral-500)]" strokeWidth={1.6} />
+                    60-day free returns
+                  </li>
+                </ul>
+
+                <Accordion type="single" collapsible defaultValue="description">
+                  <AccordionItem value="description">
+                    <AccordionTrigger>Description</AccordionTrigger>
+                    <AccordionContent>
+                      <div
+                        className="prose prose-sm max-w-none text-[var(--color-neutral-600)]"
+                        dangerouslySetInnerHTML={{__html: descriptionHtml}}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="materials">
+                    <AccordionTrigger>Materials & care</AccordionTrigger>
+                    <AccordionContent>
+                      <p>
+                        Crafted from responsibly-sourced materials. Wash cold,
+                        line dry, iron on low. Avoid bleach and dry cleaning to
+                        preserve the finish.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="shipping">
+                    <AccordionTrigger>Shipping & returns</AccordionTrigger>
+                    <AccordionContent>
+                      <p>
+                        Free standard shipping on orders over $150. Express and
+                        next-day delivery available at checkout. 60-day free
+                        returns — no questions asked.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            </ScrollReveal>
+          </div>
+        </Container>
+      </Section>
+
       <Analytics.ProductView
         data={{
           products: [
@@ -135,7 +188,7 @@ export default function Product() {
           ],
         }}
       />
-    </div>
+    </>
   );
 }
 
@@ -186,6 +239,15 @@ const PRODUCT_FRAGMENT = `#graphql
     description
     encodedVariantExistence
     encodedVariantAvailability
+    images(first: 10) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     options {
       name
       optionValues {

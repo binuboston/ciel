@@ -1,0 +1,111 @@
+/**
+ * Tailwind v4 design tokens.
+ * Tokens declared inside @theme are exposed as Tailwind utilities AND CSS variables,
+ * so we can use them both via class names (e.g. text-ink, bg-paper) and via
+ * raw `var(--color-ink)` references inside custom CSS.
+ *
+ * https://tailwindcss.com/docs/v4-beta#css-first-configuration
+ */
+
+@theme {
+  /* ----- Color: surfaces & ink ----- */
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #1a1a1a;
+  --color-paper: #ffffff;
+  --color-paper-warm: #f6f5f1;
+
+  /* Neutral ramp (cool gray) */
+  --color-neutral-50: #f7f7f7;
+  --color-neutral-100: #ededed;
+  --color-neutral-200: #d9d9d9;
+  --color-neutral-300: #b3b3b3;
+  --color-neutral-400: #8a8a8a;
+  --color-neutral-500: #5e5e5e;
+  --color-neutral-600: #404040;
+  --color-neutral-700: #2b2b2b;
+  --color-neutral-800: #1a1a1a;
+  --color-neutral-900: #0a0a0a;
+
+  /* Vivid accent */
+  --color-accent: #d7ff3e;
+  --color-accent-ink: #0a0a0a;
+
+  /* Status */
+  --color-danger: #ef4444;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+
+  /* ----- Typography -----
+   * Space Grotesk is the primary typeface for the entire storefront —
+   * used for both display headings (heavier weights) and body copy
+   * (regular/medium). Keeping a single family creates a cohesive,
+   * confident brand voice. */
+  --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui,
+    -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui,
+    -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+
+  /* Fluid type scale (clamp(min, ideal, max)) */
+  --text-display: clamp(3rem, 8vw, 8rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.04em;
+
+  --text-h1: clamp(2.25rem, 4.5vw, 4.5rem);
+  --text-h1--line-height: 1;
+  --text-h1--letter-spacing: -0.03em;
+
+  --text-h2: clamp(1.75rem, 3vw, 3rem);
+  --text-h2--line-height: 1.05;
+  --text-h2--letter-spacing: -0.02em;
+
+  --text-h3: clamp(1.375rem, 2vw, 1.875rem);
+  --text-h3--line-height: 1.15;
+  --text-h3--letter-spacing: -0.015em;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.55;
+
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.45;
+
+  /* ----- Radii ----- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
+
+  /* ----- Shadows ----- */
+  --shadow-soft: 0 1px 2px rgba(10, 10, 10, 0.04),
+    0 4px 16px rgba(10, 10, 10, 0.06);
+  --shadow-pop: 0 12px 40px rgba(10, 10, 10, 0.18);
+  --shadow-ring: 0 0 0 1px rgba(10, 10, 10, 0.08);
+
+  /* ----- Motion ----- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 420ms;
+  --duration-page: 600ms;
+
+  /* ----- Layout ----- */
+  --container-max: 1440px;
+  --header-height: 72px;
+  --header-height-compact: 56px;
+}
+
+/* Dark surface tokens (used by inverted sections, footer, hero) */
+.surface-dark {
+  --color-ink: #f7f7f7;
+  --color-ink-soft: #d9d9d9;
+  --color-paper: #0a0a0a;
+  --color-paper-warm: #111111;
+  color: var(--color-ink);
+  background: var(--color-paper);
+}

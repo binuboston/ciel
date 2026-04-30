@@ -13,10 +13,8 @@ import {
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
-import resetStyles from '~/styles/reset.css?url';
-import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
-import {PageLayout} from './components/PageLayout';
+import {PageLayout} from './components/layout/PageLayout';
 
 export type RootLoader = typeof loader;
 
@@ -42,26 +40,11 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   return false;
 };
 
-/**
- * The main and reset stylesheets are added in the Layout component
- * to prevent a bug in development HMR updates.
- *
- * This avoids the "failed to execute 'insertBefore' on 'Node'" error
- * that occurs after editing and navigating to another page.
- *
- * It's a temporary fix until the issue is resolved.
- * https://github.com/remix-run/remix/issues/9242
- */
 export function links() {
   return [
-    {
-      rel: 'preconnect',
-      href: 'https://cdn.shopify.com',
-    },
-    {
-      rel: 'preconnect',
-      href: 'https://shop.app',
-    },
+    {rel: 'preconnect', href: 'https://cdn.shopify.com'},
+    {rel: 'preconnect', href: 'https://shop.app'},
+    {rel: 'preconnect', href: 'https://cdn.jsdelivr.net', crossOrigin: 'anonymous'},
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }
@@ -150,9 +133,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href={tailwindCss}></link>
-        <link rel="stylesheet" href={resetStyles}></link>
-        <link rel="stylesheet" href={appStyles}></link>
+        <link rel="stylesheet" href={tailwindCss} />
         <Meta />
         <Links />
       </head>
@@ -198,14 +179,24 @@ export function ErrorBoundary() {
   }
 
   return (
-    <div className="route-error">
-      <h1>Oops</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
-      )}
+    <div className="grid min-h-svh place-items-center bg-[var(--color-paper)] px-6 text-center">
+      <div className="flex max-w-lg flex-col items-center gap-6">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
+          Error
+        </p>
+        <h1 className="font-display text-[clamp(3rem,10vw,6rem)] font-bold leading-[0.95] tracking-[-0.04em]">
+          {errorStatus}
+        </h1>
+        {errorMessage ? (
+          <p className="text-base text-[var(--color-neutral-600)]">{errorMessage}</p>
+        ) : null}
+        <a
+          href="/"
+          className="inline-flex h-11 items-center rounded-full bg-[var(--color-ink)] px-6 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink-soft)]"
+        >
+          Take me home
+        </a>
+      </div>
     </div>
   );
 }

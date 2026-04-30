@@ -6,7 +6,7 @@ import {
   urlWithTrackingParams,
   type PredictiveSearchReturn,
 } from '~/lib/search';
-import {useAside} from './Aside';
+import {useUIState} from './layout/UIStateProvider';
 
 type PredictiveSearchItems = PredictiveSearchReturn['result']['items'];
 
@@ -42,7 +42,7 @@ type SearchResultsPredictiveProps = {
 export function SearchResultsPredictive({
   children,
 }: SearchResultsPredictiveProps) {
-  const aside = useAside();
+  const ui = useUIState();
   const {term, inputRef, fetcher, total, items} = usePredictiveSearch();
 
   /*
@@ -60,7 +60,7 @@ export function SearchResultsPredictive({
    */
   function closeSearch() {
     resetInput();
-    aside.close();
+    ui.close();
   }
 
   return children({

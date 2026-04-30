@@ -1,6 +1,36 @@
-/**
- * Configure Tailwind v4 in this file using CSS variables and directives:
- * https://tailwindcss.com/docs/v4-beta#css-first-configuration
- */
-
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import './tokens.css';
+@import './base.css';
+
+@import '@fontsource-variable/space-grotesk/index.css';
+
+/* Custom utility: glass surface used by the sticky header. */
+@utility surface-glass {
+  background: color-mix(in srgb, var(--color-paper) 70%, transparent);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+}
+
+/* Marquee animation primitives (consumed by the Marquee component) */
+@utility animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

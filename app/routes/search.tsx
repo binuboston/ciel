@@ -1,20 +1,23 @@
+import {Analytics, getPaginationVariables} from '@shopify/hydrogen';
 import {useLoaderData} from 'react-router';
-import type {Route} from './+types/search';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
+import {Container} from '~/components/layout/Container';
+import {Section} from '~/components/layout/Section';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
+import {Button} from '~/components/ui/Button';
 import {
-  type RegularSearchReturn,
-  type PredictiveSearchReturn,
   getEmptyPredictiveSearchResult,
+  type PredictiveSearchReturn,
+  type RegularSearchReturn,
 } from '~/lib/search';
 import type {
-  RegularSearchQuery,
   PredictiveSearchQuery,
+  RegularSearchQuery,
 } from 'storefrontapi.generated';
+import type {Route} from './+types/search';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: 'Search — Ciel'}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -41,39 +44,56 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
-      ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
-            <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
+    <Section spacing="md">
+      <Container className="flex flex-col gap-10">
+        <header className="flex flex-col gap-3">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
+            Search
+          </span>
+          <h1 className="font-display text-[clamp(2.25rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em]">
+            {term ? <>Results for &ldquo;{term}&rdquo;</> : 'What are you looking for?'}
+          </h1>
+        </header>
+
+        <SearchForm>
+          {({inputRef}) => (
+            <div className="flex items-center gap-3 rounded-full border border-[var(--color-neutral-200)] bg-transparent px-2 py-2">
+              <input
+                defaultValue={term}
+                name="q"
+                placeholder="Search products, collections, journal…"
+                ref={inputRef}
+                type="search"
+                className="flex-1 bg-transparent px-3 py-2 text-sm placeholder:text-[var(--color-neutral-400)] focus:outline-none"
+              />
+              <Button type="submit" size="sm">
+                Search
+              </Button>
             </div>
           )}
-        </SearchResults>
-      )}
-      <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
-    </div>
+        </SearchForm>
+
+        {error ? (
+          <p className="text-sm text-[var(--color-danger)]">{error}</p>
+        ) : null}
+
+        {!term || !result?.total ? (
+          <SearchResults.Empty />
+        ) : (
+          <SearchResults result={result} term={term}>
+            {({articles, pages, products, term: t}) => (
+              <div className="flex flex-col gap-12">
+                <SearchResults.Products products={products} term={t} />
+                <SearchResults.Pages pages={pages} term={t} />
+                <SearchResults.Articles articles={articles} term={t} />
+              </div>
+            )}
+          </SearchResults>
+        )}
+
+        <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
+      </Container>
+    </Section>
   );
 }
 

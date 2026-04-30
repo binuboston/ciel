@@ -1,8 +1,12 @@
-import * as React from 'react';
 import {Pagination} from '@shopify/hydrogen';
+import * as React from 'react';
+import {Button} from '~/components/ui/Button';
+import {cn} from '~/lib/cn';
 
 /**
- * <PaginatedResourceSection> encapsulates the previous and next pagination behaviors throughout your application.
+ * Cursor-based "Load more / Load previous" pagination wrapper used by PLP and
+ * blog routes. The trigger buttons are rendered with the design-system Button
+ * primitive so they stay visually consistent across the storefront.
  */
 export function PaginatedResourceSection<NodesType>({
   connection,
@@ -17,26 +21,27 @@ export function PaginatedResourceSection<NodesType>({
 }) {
   return (
     <Pagination connection={connection}>
-      {({nodes, isLoading, PreviousLink, NextLink}) => {
+      {({nodes, isLoading, PreviousLink, NextLink, hasPreviousPage, hasNextPage}) => {
         const resourcesMarkup = nodes.map((node, index) =>
           children({node, index}),
         );
 
         return (
-          <div>
-            <PreviousLink>
-              {isLoading ? (
-                'Loading...'
-              ) : (
-                <span>
-                  <span aria-hidden="true">↑</span> Load previous
-                </span>
-              )}
-            </PreviousLink>
+          <div className="flex flex-col gap-12">
+            {hasPreviousPage ? (
+              <div className="flex justify-center">
+                <Button asChild variant="outline" size="md">
+                  <PreviousLink>
+                    {isLoading ? 'Loading…' : 'Load previous'}
+                  </PreviousLink>
+                </Button>
+              </div>
+            ) : null}
+
             {resourcesClassName ? (
               <div
                 aria-label={ariaLabel}
-                className={resourcesClassName}
+                className={cn(resourcesClassName)}
                 role={ariaLabel ? 'region' : undefined}
               >
                 {resourcesMarkup}
@@ -44,15 +49,14 @@ export function PaginatedResourceSection<NodesType>({
             ) : (
               resourcesMarkup
             )}
-            <NextLink>
-              {isLoading ? (
-                'Loading...'
-              ) : (
-                <span>
-                  Load more <span aria-hidden="true">↓</span>
-                </span>
-              )}
-            </NextLink>
+
+            {hasNextPage ? (
+              <div className="flex justify-center">
+                <Button asChild variant="outline" size="md">
+                  <NextLink>{isLoading ? 'Loading…' : 'Load more'}</NextLink>
+                </Button>
+              </div>
+            ) : null}
           </div>
         );
       }}
