@@ -1,52 +1,59 @@
 /**
- * Tailwind v4 design tokens.
- * Tokens declared inside @theme are exposed as Tailwind utilities AND CSS variables,
- * so we can use them both via class names (e.g. text-ink, bg-paper) and via
- * raw `var(--color-ink)` references inside custom CSS.
+ * Tailwind v4 design tokens — CIEL CLOTHING VISUAL IDENTITY (brand PDF).
  *
- * https://tailwindcss.com/docs/v4-beta#css-first-configuration
+ * Raw palette:
+ *   Deep Black #000000 (01)   Smoky Black #11120d (02)   Olive Drab #454438 (03)
+ *   Bone #d8d0bc (04)         Floral White #fffaf4 (05)
+ *   Jet #31322a (03b)         Chamoisee #a28a68 (04b)    Platinum #e7e7e7 (05b)
  */
 
 @theme {
-  /* ----- Color: surfaces & ink ----- */
-  --color-ink: #0a0a0a;
-  --color-ink-soft: #1a1a1a;
-  --color-paper: #ffffff;
-  --color-paper-warm: #f6f5f1;
+  /* ----- Brand (raw) ----- */
+  --color-deep-black: #000000;
+  --color-smoky-black: #11120d;
+  --color-olive-drab: #454438;
+  --color-bone: #d8d0bc;
+  --color-floral-white: #fffaf4;
+  --color-jet: #31322a;
+  --color-chamoisee: #a28a68;
+  --color-platinum: #e7e7e7;
 
-  /* Neutral ramp (cool gray) */
-  --color-neutral-50: #f7f7f7;
-  --color-neutral-100: #ededed;
-  --color-neutral-200: #d9d9d9;
-  --color-neutral-300: #b3b3b3;
-  --color-neutral-400: #8a8a8a;
-  --color-neutral-500: #5e5e5e;
-  --color-neutral-600: #404040;
-  --color-neutral-700: #2b2b2b;
-  --color-neutral-800: #1a1a1a;
-  --color-neutral-900: #0a0a0a;
+  /* ----- Semantic: light surfaces ----- */
+  --color-ink: #11120d;
+  --color-ink-soft: #31322a;
+  --color-paper: #fffaf4;
+  --color-paper-warm: #d8d0bc;
 
-  /* Vivid accent */
-  --color-accent: #d7ff3e;
-  --color-accent-ink: #0a0a0a;
+  /* Neutral ramp — warm, from the same palette */
+  --color-neutral-50: #fffaf4;
+  --color-neutral-100: #f5f0e6;
+  --color-neutral-200: #e7e7e7;
+  --color-neutral-300: #d8d0bc;
+  --color-neutral-400: #a28a68;
+  --color-neutral-500: #454438;
+  --color-neutral-600: #3a3c34;
+  --color-neutral-700: #31322a;
+  --color-neutral-800: #11120d;
+  --color-neutral-900: #000000;
 
-  /* Status */
-  --color-danger: #ef4444;
-  --color-success: #16a34a;
-  --color-warning: #f59e0b;
+  /* Accent CTA — Chamoisee fill, Deep Black type */
+  --color-accent: #a28a68;
+  --color-accent-ink: #000000;
+  --color-accent-soft: #d8d0bc;
+  --color-brand-olive: #454438;
 
-  /* ----- Typography -----
-   * Space Grotesk is the primary typeface for the entire storefront —
-   * used for both display headings (heavier weights) and body copy
-   * (regular/medium). Keeping a single family creates a cohesive,
-   * confident brand voice. */
+  /* Status — muted, on-brand */
+  --color-danger: #8b3a2f;
+  --color-success: #454438;
+  --color-warning: #8a6a3a;
+
+  /* ----- Typography ----- */
   --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui,
     -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui,
     -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
 
-  /* Fluid type scale (clamp(min, ideal, max)) */
   --text-display: clamp(3rem, 8vw, 8rem);
   --text-display--line-height: 0.95;
   --text-display--letter-spacing: -0.04em;
@@ -69,7 +76,6 @@
   --text-small: 0.8125rem;
   --text-small--line-height: 1.45;
 
-  /* ----- Radii ----- */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -78,13 +84,12 @@
   --radius-2xl: 32px;
   --radius-pill: 999px;
 
-  /* ----- Shadows ----- */
-  --shadow-soft: 0 1px 2px rgba(10, 10, 10, 0.04),
-    0 4px 16px rgba(10, 10, 10, 0.06);
-  --shadow-pop: 0 12px 40px rgba(10, 10, 10, 0.18);
-  --shadow-ring: 0 0 0 1px rgba(10, 10, 10, 0.08);
+  /* Shadows — tinted with smoky black */
+  --shadow-soft: 0 1px 2px rgba(17, 18, 13, 0.05),
+    0 4px 16px rgba(17, 18, 13, 0.07);
+  --shadow-pop: 0 12px 40px rgba(17, 18, 13, 0.18);
+  --shadow-ring: 0 0 0 1px rgba(17, 18, 13, 0.08);
 
-  /* ----- Motion ----- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
   --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -94,18 +99,17 @@
   --duration-slow: 420ms;
   --duration-page: 600ms;
 
-  /* ----- Layout ----- */
   --container-max: 1440px;
   --header-height: 72px;
   --header-height-compact: 56px;
 }
 
-/* Dark surface tokens (used by inverted sections, footer, hero) */
+/* Dark surfaces: ink = light text, paper = deep surface */
 .surface-dark {
-  --color-ink: #f7f7f7;
-  --color-ink-soft: #d9d9d9;
-  --color-paper: #0a0a0a;
-  --color-paper-warm: #111111;
+  --color-ink: #fffaf4;
+  --color-ink-soft: #d8d0bc;
+  --color-paper: #000000;
+  --color-paper-warm: #11120d;
   color: var(--color-ink);
   background: var(--color-paper);
 }

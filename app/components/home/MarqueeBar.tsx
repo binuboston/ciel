@@ -18,8 +18,8 @@ interface MarqueeBarProps {
 
 export function MarqueeBar({items = DEFAULT_ITEMS, reverse}: MarqueeBarProps) {
   return (
-    <div className="surface-dark border-y border-[var(--color-neutral-700)]">
-      <Marquee reverse={reverse} className="py-4 text-[var(--color-paper)]">
+    <div className="surface-dark border-y border-white/10">
+      <Marquee reverse={reverse} className="py-4 text-[var(--color-ink)]">
         {items.map((item) => (
           <span
             key={item}

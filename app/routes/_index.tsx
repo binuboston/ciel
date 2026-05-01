@@ -47,11 +47,28 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {recommendedProducts};
 }
 
+const HERO_VIDEO_BASE =
+  'https://demo-1-9580.myshopify.com/cdn/shop/videos/c/vp/5c8186d6608d45f38e64e409e73a4697/5c8186d6608d45f38e64e409e73a4697';
+const HERO_VIDEO_SOURCES = [
+  {
+    src: `${HERO_VIDEO_BASE}.HD-1080p-3.3Mbps-73883969.mp4?v=0`,
+    type: 'video/mp4',
+    media: '(min-width: 1024px)',
+  },
+  {
+    src: `${HERO_VIDEO_BASE}.HD-720p-2.1Mbps-73883969.mp4?v=0`,
+    type: 'video/mp4',
+  },
+];
+
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
     <>
-      <Hero collection={data.featuredCollection} />
+      <Hero
+        collection={data.featuredCollection}
+        videoSources={HERO_VIDEO_SOURCES}
+      />
       <MarqueeBar />
       <RecommendedProducts products={data.recommendedProducts} />
       <FeaturedCollection collection={data.secondaryCollection ?? data.featuredCollection} />
