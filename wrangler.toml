@@ -1,0 +1,35 @@
+#:schema node_modules/wrangler/config-schema.json
+# Cloudflare Workers configuration for the CIEL Hydrogen storefront.
+#
+# This deploys the same artifact `npm run build` produces — Hydrogen's worker
+# bundle (`dist/server/index.js`) — directly to Cloudflare Workers, with
+# `dist/client/` served as static assets at the edge.
+#
+# Public preview URL after `npm run deploy`:
+#   https://ciel.<your-cloudflare-subdomain>.workers.dev
+
+name = "ciel"
+main = "dist/server/index.js"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Serve everything in dist/client (CSS, fonts, JS chunks, favicon) from the
+# edge as static assets. Cloudflare matches the request path against this
+# directory first; only unmatched paths fall through to the worker.
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+
+# ---------------------------------------------------------------------------
+# Public, non-secret env vars — safe to commit. Mirrors `.env` for production.
+# Switch the four PUBLIC_* values to your real Storefront API credentials when
+# moving off mock.shop. See README.md → "Switching from mock.shop to Shopify".
+# ---------------------------------------------------------------------------
+[vars]
+PUBLIC_STORE_DOMAIN = "mock.shop"
+PUBLIC_STOREFRONT_API_TOKEN = "public_demo_token"
+PUBLIC_STOREFRONT_ID = "mock-shop"
+PUBLIC_CHECKOUT_DOMAIN = "mock.shop"
+
+# SESSION_SECRET is set as a Wrangler secret (not committed):
+#   npx wrangler secret put SESSION_SECRET
