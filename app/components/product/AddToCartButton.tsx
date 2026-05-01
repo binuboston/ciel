@@ -40,7 +40,7 @@ export function AddToCartButton({
             disabled={disabled ?? fetcher.state !== 'idle'}
             variant={variant}
             size={size}
-            className={cn('w-full', className)}
+            className={cn('w-full min-h-14 [&_svg]:text-inherit', className)}
           >
             <ShoppingBag className="h-4 w-4" strokeWidth={2.5} />
             {children}
