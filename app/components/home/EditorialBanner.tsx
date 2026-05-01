@@ -1,5 +1,6 @@
 import {ArrowUpRight} from 'lucide-react';
 import {Link} from 'react-router';
+import logoLight from '~/assets/brand/logo-light.svg';
 import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
@@ -41,7 +42,12 @@ export function EditorialBanner({
           <p className="max-w-prose text-base text-[var(--color-neutral-600)] md:text-lg">
             {body}
           </p>
-          <Button asChild variant="primary" size="lg" className="self-start">
+          <Button
+            asChild
+            variant="primary"
+            size="lg"
+            className="self-start bg-[var(--color-deep-black)] text-[var(--color-floral-white)] hover:bg-[var(--color-smoky-black)]"
+          >
             <Link to={ctaHref} prefetch="intent">
               {ctaLabel}
               <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
@@ -49,7 +55,7 @@ export function EditorialBanner({
           </Button>
         </ScrollReveal>
         <ScrollReveal>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-100)]">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-900)]">
             {media?.url ? (
               media.type === 'video' ? (
                 <video
@@ -58,23 +64,29 @@ export function EditorialBanner({
                   loop
                   muted
                   playsInline
-                  className="h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full scale-110 object-cover blur-[2px]"
                 />
               ) : (
                 <img
                   src={media.url}
                   alt=""
                   loading="lazy"
-                  className="h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full scale-110 object-cover blur-[2px]"
                 />
               )
             ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <span className="font-display text-[clamp(3rem,12vw,8rem)] font-black tracking-[-0.04em] text-[var(--color-neutral-200)]">
-                  CIEL
-                </span>
-              </div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--color-neutral-700),var(--color-neutral-900)_60%)]" />
             )}
+            <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.15)_55%,rgba(0,0,0,0.45)_100%)]" aria-hidden="true" />
+            <div className="absolute inset-0 grid place-items-center px-6">
+              <img
+                src={logoLight}
+                alt="CIEL"
+                loading="lazy"
+                className="w-full max-w-[320px] opacity-90 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+              />
+            </div>
           </div>
         </ScrollReveal>
       </Container>

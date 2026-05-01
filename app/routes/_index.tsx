@@ -38,13 +38,13 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+  const recommendedCollections = context.storefront
+    .query(RECOMMENDED_COLLECTIONS_QUERY)
     .catch((error: Error) => {
       console.error(error);
       return null;
     });
-  return {recommendedProducts};
+  return {recommendedCollections};
 }
 
 const HERO_VIDEO_BASE =
@@ -63,6 +63,8 @@ const HERO_VIDEO_SOURCES = [
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+  const editorialMediaUrl =
+    data.secondaryCollection?.image?.url ?? data.featuredCollection?.image?.url;
   return (
     <>
       <Hero
@@ -70,9 +72,11 @@ export default function Homepage() {
         videoSources={HERO_VIDEO_SOURCES}
       />
       <MarqueeBar />
-      <RecommendedProducts products={data.recommendedProducts} />
+      <RecommendedProducts products={data.recommendedCollections} />
       <FeaturedCollection collection={data.secondaryCollection ?? data.featuredCollection} />
-      <EditorialBanner />
+      <EditorialBanner
+        media={editorialMediaUrl ? {url: editorialMediaUrl, type: 'image'} : undefined}
+      />
     </>
   );
 }
@@ -100,45 +104,24 @@ const FEATURED_COLLECTION_QUERY = `#graphql
   }
 ` as const;
 
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
+const RECOMMENDED_COLLECTIONS_QUERY = `#graphql
+  fragment RecommendedCollection on Collection {
     id
     title
     handle
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    compareAtPriceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
+    image {
       id
       url
       altText
       width
       height
     }
-    images(first: 2) {
-      nodes {
-        id
-        url
-        altText
-        width
-        height
-      }
-    }
   }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
+  query RecommendedCollections ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 8, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
-        ...RecommendedProduct
+        ...RecommendedCollection
       }
     }
   }

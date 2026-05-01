@@ -47,7 +47,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}: HeaderProp
         >
           <Logo
             decorative
-            className="h-5 w-auto md:h-6 transition-[height] duration-[var(--duration-base)]"
+            className="h-7 w-auto md:h-8 transition-[height] duration-[var(--duration-base)]"
           />
         </NavLink>
 

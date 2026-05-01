@@ -1,9 +1,12 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/blogs.$blogHandle._index';
 import {Image, getPaginationVariables} from '@shopify/hydrogen';
+import {Link, useLoaderData} from 'react-router';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
+import {Container} from '~/components/layout/Container';
+import {Section} from '~/components/layout/Section';
+import {ScrollReveal} from '~/components/motion/ScrollReveal';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import type {Route} from './+types/blogs.$blogHandle._index';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data?.blog.title ?? ''} blog`}];
@@ -65,20 +68,37 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
-      <div className="blog-grid">
-        <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
-          {({node: article, index}) => (
-            <ArticleItem
-              article={article}
-              key={article.id}
-              loading={index < 2 ? 'eager' : 'lazy'}
-            />
-          )}
-        </PaginatedResourceSection>
-      </div>
-    </div>
+    <>
+      <Section spacing="md" className="border-b border-[var(--color-neutral-200)]">
+        <Container className="flex flex-col gap-4">
+          <ScrollReveal className="flex flex-col gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
+              {blog.handle}
+            </span>
+            <h1 className="font-display text-[clamp(2.25rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em]">
+              {blog.title}
+            </h1>
+          </ScrollReveal>
+        </Container>
+      </Section>
+
+      <Section spacing="md">
+        <Container>
+          <PaginatedResourceSection<ArticleItemFragment>
+            connection={articles}
+            resourcesClassName="grid grid-cols-1 gap-8 md:grid-cols-2"
+          >
+            {({node: article, index}) => (
+              <ArticleItem
+                article={article}
+                key={article.id}
+                loading={index < 2 ? 'eager' : 'lazy'}
+              />
+            )}
+          </PaginatedResourceSection>
+        </Container>
+      </Section>
+    </>
   );
 }
 
@@ -95,24 +115,43 @@ function ArticleItem({
     day: 'numeric',
   }).format(new Date(article.publishedAt!));
   return (
-    <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
-        {article.image && (
-          <div className="blog-article-image">
-            <Image
-              alt={article.image.altText || article.title}
-              aspectRatio="3/2"
-              data={article.image}
-              loading={loading}
-              sizes="(min-width: 768px) 50vw, 100vw"
-            />
-          </div>
-        )}
-        <h3>{article.title}</h3>
-        <small>{publishedAt}</small>
-      </Link>
-    </div>
+    <Link
+      to={`/blogs/${article.blog.handle}/${article.handle}`}
+      className="group block rounded-[var(--radius-2xl)] border border-[var(--color-neutral-200)] bg-[var(--color-paper)] p-4 transition-colors hover:border-[var(--color-neutral-400)]"
+    >
+      {article.image ? (
+        <div className="overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-neutral-100)]">
+          <Image
+            alt={article.image.altText || article.title}
+            aspectRatio="3/2"
+            data={article.image}
+            loading={loading}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="h-full w-full object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-expo)] group-hover:scale-[1.02]"
+          />
+        </div>
+      ) : null}
+      <div className="mt-4 flex flex-col gap-3">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]">
+          {publishedAt}
+        </span>
+        <h2 className="font-display text-[clamp(1.4rem,2.2vw,2rem)] font-semibold leading-[1.05] tracking-[-0.02em]">
+          {article.title}
+        </h2>
+        <p className="line-clamp-3 text-sm text-[var(--color-neutral-600)]">
+          {toPlainText(article.contentHtml)}
+        </p>
+        <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)] transition-colors group-hover:text-[var(--color-ink)]">
+          Read story
+        </span>
+      </div>
+    </Link>
   );
+}
+
+function toPlainText(html: string | null | undefined) {
+  if (!html) return 'Read the full story.';
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog

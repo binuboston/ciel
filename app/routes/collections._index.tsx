@@ -1,7 +1,10 @@
-import {useLoaderData, Link} from 'react-router';
-import type {Route} from './+types/collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import {Link, useLoaderData} from 'react-router';
+import type {Route} from './+types/collections._index';
 import type {CollectionFragment} from 'storefrontapi.generated';
+import {Container} from '~/components/layout/Container';
+import {Section} from '~/components/layout/Section';
+import {ScrollReveal} from '~/components/motion/ScrollReveal';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 export async function loader(args: Route.LoaderArgs) {
@@ -46,21 +49,40 @@ export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collections">
-      <h1>Collections</h1>
-      <PaginatedResourceSection<CollectionFragment>
-        connection={collections}
-        resourcesClassName="collections-grid"
-      >
-        {({node: collection, index}) => (
-          <CollectionItem
-            key={collection.id}
-            collection={collection}
-            index={index}
-          />
-        )}
-      </PaginatedResourceSection>
-    </div>
+    <>
+      <Section spacing="md" className="border-b border-[var(--color-neutral-200)]">
+        <Container className="flex flex-col gap-4">
+          <ScrollReveal className="flex flex-col gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
+              Collections
+            </span>
+            <h1 className="font-display text-[clamp(2.25rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em]">
+              Explore by drop
+            </h1>
+            <p className="max-w-2xl text-base text-[var(--color-neutral-600)] md:text-lg">
+              Curated edits designed around fit, function, and form.
+            </p>
+          </ScrollReveal>
+        </Container>
+      </Section>
+
+      <Section spacing="md">
+        <Container>
+          <PaginatedResourceSection<CollectionFragment>
+            connection={collections}
+            resourcesClassName="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {({node: collection, index}) => (
+              <CollectionItem
+                key={collection.id}
+                collection={collection}
+                index={index}
+              />
+            )}
+          </PaginatedResourceSection>
+        </Container>
+      </Section>
+    </>
   );
 }
 
@@ -73,21 +95,33 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="collection-item"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
+      className="group flex flex-col gap-4"
     >
-      {collection?.image && (
-        <Image
-          alt={collection.image.altText || collection.title}
-          aspectRatio="1/1"
-          data={collection.image}
-          loading={index < 3 ? 'eager' : undefined}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h5>{collection.title}</h5>
+      <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-200)]">
+        {collection?.image ? (
+          <Image
+            alt={collection.image.altText || collection.title}
+            aspectRatio="4/5"
+            data={collection.image}
+            loading={index < 3 ? 'eager' : undefined}
+            sizes="(min-width: 1200px) 30vw, (min-width: 768px) 45vw, 100vw"
+            className="h-full w-full object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-expo)] group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="aspect-[4/5] w-full bg-[var(--color-neutral-200)]" />
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold tracking-[-0.02em]">
+          {collection.title}
+        </h2>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)] transition-colors group-hover:text-[var(--color-ink)]">
+          Shop
+        </span>
+      </div>
     </Link>
   );
 }

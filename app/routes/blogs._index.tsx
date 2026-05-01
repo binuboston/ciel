@@ -1,8 +1,11 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/blogs._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {Link, useLoaderData} from 'react-router';
 import type {BlogsQuery} from 'storefrontapi.generated';
+import {Container} from '~/components/layout/Container';
+import {Section} from '~/components/layout/Section';
+import {ScrollReveal} from '~/components/motion/ScrollReveal';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import type {Route} from './+types/blogs._index';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
@@ -54,23 +57,54 @@ export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
   return (
-    <div className="blogs">
-      <h1>Blogs</h1>
-      <div className="blogs-grid">
-        <PaginatedResourceSection<BlogNode> connection={blogs}>
-          {({node: blog}) => (
-            <Link
-              className="blog"
-              key={blog.handle}
-              prefetch="intent"
-              to={`/blogs/${blog.handle}`}
-            >
-              <h2>{blog.title}</h2>
-            </Link>
-          )}
-        </PaginatedResourceSection>
-      </div>
-    </div>
+    <>
+      <Section spacing="md" className="border-b border-[var(--color-neutral-200)]">
+        <Container className="flex flex-col gap-4">
+          <ScrollReveal className="flex flex-col gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
+              Journal
+            </span>
+            <h1 className="font-display text-[clamp(2.25rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em]">
+              Stories and drops
+            </h1>
+            <p className="max-w-2xl text-base text-[var(--color-neutral-600)] md:text-lg">
+              Campaign notes, material deep-dives, and release stories from CIEL.
+            </p>
+          </ScrollReveal>
+        </Container>
+      </Section>
+
+      <Section spacing="md">
+        <Container>
+          <PaginatedResourceSection<BlogNode>
+            connection={blogs}
+            resourcesClassName="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {({node: blog}) => (
+              <Link
+                key={blog.handle}
+                prefetch="intent"
+                to={`/blogs/${blog.handle}`}
+                className="group rounded-[var(--radius-2xl)] border border-[var(--color-neutral-200)] bg-[var(--color-paper)] p-6 transition-colors hover:border-[var(--color-neutral-400)]"
+              >
+                <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]">
+                  Blog
+                </span>
+                <h2 className="mt-3 font-display text-2xl font-semibold tracking-[-0.02em]">
+                  {blog.title}
+                </h2>
+                <p className="mt-3 text-sm text-[var(--color-neutral-500)]">
+                  {blog.seo?.description || 'Read the latest stories from this edit.'}
+                </p>
+                <span className="mt-5 inline-flex text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)] transition-colors group-hover:text-[var(--color-ink)]">
+                  Open journal
+                </span>
+              </Link>
+            )}
+          </PaginatedResourceSection>
+        </Container>
+      </Section>
+    </>
   );
 }
 

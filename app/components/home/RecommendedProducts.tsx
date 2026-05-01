@@ -1,16 +1,16 @@
 import {ArrowUpRight} from 'lucide-react';
 import {Suspense} from 'react';
 import {Await, Link} from 'react-router';
-import type {RecommendedProductsQuery} from 'storefrontapi.generated';
+import {Image} from '@shopify/hydrogen';
+import type {FeaturedCollectionFragment} from 'storefrontapi.generated';
 import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
-import {ProductCard} from '~/components/product/ProductCard';
 import {Skeleton} from '~/components/ui/Skeleton';
 import {fadeUp, stagger} from '~/lib/motion';
 
 interface RecommendedProductsProps {
-  products: Promise<RecommendedProductsQuery | null>;
+  products: Promise<{collections?: {nodes: FeaturedCollectionFragment[]}} | null>;
   title?: string;
   eyebrow?: string;
 }
@@ -59,18 +59,18 @@ export function RecommendedProducts({
         <Suspense fallback={<ProductsGridSkeleton />}>
           <Await resolve={products}>
             {(response) =>
-              response?.products?.nodes ? (
+              response?.collections?.nodes ? (
                 <ScrollReveal
                   variants={stagger(0.05, 0.07)}
-                  className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4"
+                  className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
                 >
-                  {response.products.nodes.map((product, i) => (
+                  {response.collections.nodes.map((collection, i) => (
                     <ScrollReveal
-                      key={product.id}
+                      key={collection.id}
                       variants={fadeUp}
                       as="div"
                     >
-                      <ProductCard product={product} priority={i < 4} />
+                      <CollectionCard collection={collection} priority={i < 4} />
                     </ScrollReveal>
                   ))}
                 </ScrollReveal>
@@ -83,9 +83,44 @@ export function RecommendedProducts({
   );
 }
 
+function CollectionCard({
+  collection,
+  priority,
+}: {
+  collection: FeaturedCollectionFragment;
+  priority?: boolean;
+}) {
+  return (
+    <Link to={`/collections/${collection.handle}`} prefetch="intent" className="group flex flex-col gap-4">
+      <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-200)]">
+        {collection.image ? (
+          <Image
+            data={collection.image}
+            alt={collection.image.altText || collection.title}
+            aspectRatio="4/5"
+            loading={priority ? 'eager' : 'lazy'}
+            sizes="(min-width: 1200px) 25vw, (min-width: 768px) 40vw, 100vw"
+            className="h-full w-full object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-expo)] group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="aspect-[4/5] w-full bg-[var(--color-neutral-200)]" />
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-display text-2xl font-semibold tracking-[-0.02em]">
+          {collection.title}
+        </h3>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)] transition-colors group-hover:text-[var(--color-ink)]">
+          Explore
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 function ProductsGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
       {['s1', 's2', 's3', 's4'].map((key) => (
         <div key={key} className="flex flex-col gap-3">
           <Skeleton className="aspect-[4/5] w-full" />

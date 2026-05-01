@@ -79,7 +79,10 @@ export default function Collection() {
 
   return (
     <>
-      <Section spacing="md" className="border-b border-[var(--color-neutral-100)]">
+      <Section
+        spacing="md"
+        className="border-b border-[var(--color-neutral-200)] bg-[var(--color-paper)]"
+      >
         <Container className="flex flex-col gap-6">
           <ScrollReveal className="flex flex-col gap-3">
             <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--color-neutral-500)]">
@@ -89,7 +92,7 @@ export default function Collection() {
               {collection.title}
             </h1>
             {collection.description ? (
-              <p className="max-w-2xl text-base text-[var(--color-neutral-600)] md:text-lg">
+              <p className="max-w-2xl text-base text-[var(--color-neutral-500)] md:text-lg">
                 {collection.description}
               </p>
             ) : null}
@@ -97,7 +100,7 @@ export default function Collection() {
         </Container>
       </Section>
 
-      <Section spacing="md">
+      <Section spacing="md" className="bg-[var(--color-paper)]">
         <Container className="flex flex-col gap-8">
           <CollectionToolbar
             sort={sort}
@@ -131,7 +134,7 @@ function CollectionToolbar({sort, count}: {sort: SortValue; count: number}) {
   const [params] = useSearchParams();
 
   return (
-    <div className="sticky top-[var(--header-height-compact)] z-20 -mx-4 flex items-center justify-between gap-4 border-y border-[var(--color-neutral-100)] surface-glass px-4 py-3 md:-mx-8 md:px-8">
+    <div className="sticky top-[var(--header-height-compact)] z-20 -mx-4 flex items-center justify-between gap-4 rounded-[var(--radius-pill)] border border-[var(--color-neutral-200)] bg-[color-mix(in_srgb,var(--color-paper)_85%,transparent)] px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-neutral-500)]">
         {count} item{count === 1 ? '' : 's'}
       </p>

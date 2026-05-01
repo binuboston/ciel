@@ -20,7 +20,7 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-[var(--color-ink)] text-[var(--color-paper)] hover:bg-[var(--color-ink-soft)]',
+    'bg-[var(--color-deep-black)] !text-[var(--color-floral-white)] hover:bg-[var(--color-smoky-black)] [&_svg]:text-inherit',
   secondary:
     'bg-[var(--color-neutral-100)] text-[var(--color-ink)] hover:bg-[var(--color-neutral-200)]',
   outline:
