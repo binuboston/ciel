@@ -1,7 +1,7 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
-import {EditorialBanner} from '~/components/home/EditorialBanner';
 import {FeaturedCollection} from '~/components/home/FeaturedCollection';
+import {FeaturedCollectionsRail} from '~/components/home/FeaturedCollectionsRail';
 import {Hero} from '~/components/home/Hero';
 import {MarqueeBar} from '~/components/home/MarqueeBar';
 import {RecommendedProducts} from '~/components/home/RecommendedProducts';
@@ -63,8 +63,6 @@ const HERO_VIDEO_SOURCES = [
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
-  const editorialMediaUrl =
-    data.secondaryCollection?.image?.url ?? data.featuredCollection?.image?.url;
   return (
     <>
       <Hero
@@ -74,9 +72,7 @@ export default function Homepage() {
       <MarqueeBar />
       <RecommendedProducts products={data.recommendedCollections} />
       <FeaturedCollection collection={data.secondaryCollection ?? data.featuredCollection} />
-      <EditorialBanner
-        media={editorialMediaUrl ? {url: editorialMediaUrl, type: 'image'} : undefined}
-      />
+      <FeaturedCollectionsRail collections={data.recommendedCollections} />
     </>
   );
 }
@@ -119,7 +115,7 @@ const RECOMMENDED_COLLECTIONS_QUERY = `#graphql
   }
   query RecommendedCollections ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 8, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 24, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedCollection
       }
