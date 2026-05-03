@@ -6,6 +6,7 @@ import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {pickCollectionCardImage, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -93,6 +94,11 @@ function CollectionItem({
   collection: CollectionFragment;
   index: number;
 }) {
+  const demoLocal = useLocalDemoMedia();
+  const imageData = demoLocal
+    ? pickCollectionCardImage(collection.handle)
+    : collection.image;
+
   return (
     <Link
       key={collection.id}
@@ -101,11 +107,11 @@ function CollectionItem({
       className="group flex flex-col gap-4"
     >
       <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-200)]">
-        {collection?.image ? (
+        {imageData ? (
           <Image
-            alt={collection.image.altText || collection.title}
+            alt={collection.image?.altText || collection.title}
             aspectRatio="4/5"
-            data={collection.image}
+            data={imageData}
             loading={index < 3 ? 'eager' : undefined}
             sizes="(min-width: 1200px) 30vw, (min-width: 768px) 45vw, 100vw"
             className="h-full w-full object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-expo)] group-hover:scale-[1.03]"

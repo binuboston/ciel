@@ -5,6 +5,7 @@ import type {FeaturedCollectionFragment} from 'storefrontapi.generated';
 import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
+import {pickCollectionCardImage, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 
 interface FeaturedCollectionProps {
   collection: FeaturedCollectionFragment | null | undefined;
@@ -15,8 +16,11 @@ export function FeaturedCollection({
   collection,
   eyebrow = 'Featured collection',
 }: FeaturedCollectionProps) {
+  const demoLocal = useLocalDemoMedia();
   if (!collection) return null;
-  const image = collection.image;
+  const image = demoLocal
+    ? pickCollectionCardImage(collection.handle)
+    : collection.image;
 
   return (
     <Section spacing="lg">

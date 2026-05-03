@@ -2,6 +2,12 @@ import {Link, useFetcher, type Fetcher} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
 import React, {useRef, useEffect} from 'react';
 import {
+  pickArticleCardImage,
+  pickCollectionCardImage,
+  pickPoolPath,
+  useLocalDemoMedia,
+} from '~/lib/demoLocalMedia';
+import {
   getEmptyPredictiveSearchResult,
   urlWithTrackingParams,
   type PredictiveSearchReturn,
@@ -85,6 +91,7 @@ function SearchResultsPredictiveArticles({
   articles,
   closeSearch,
 }: PartialPredictiveSearchResult<'articles'>) {
+  const demoLocal = useLocalDemoMedia();
   if (!articles.length) return null;
 
   return (
@@ -97,18 +104,21 @@ function SearchResultsPredictiveArticles({
             trackingParams: article.trackingParameters,
             term: term.current ?? '',
           });
+          const thumbSrc = demoLocal
+            ? pickArticleCardImage(article.handle).url
+            : article.image?.url;
 
           return (
             <li className="predictive-search-result-item" key={article.id}>
               <Link onClick={closeSearch} to={articleUrl}>
-                {article.image?.url && (
+                {thumbSrc ? (
                   <Image
-                    alt={article.image.altText ?? ''}
-                    src={article.image.url}
+                    alt={article.image?.altText ?? article.title}
+                    src={thumbSrc}
                     width={50}
                     height={50}
                   />
-                )}
+                ) : null}
                 <div>
                   <span>{article.title}</span>
                 </div>
@@ -126,6 +136,7 @@ function SearchResultsPredictiveCollections({
   collections,
   closeSearch,
 }: PartialPredictiveSearchResult<'collections'>) {
+  const demoLocal = useLocalDemoMedia();
   if (!collections.length) return null;
 
   return (
@@ -138,18 +149,21 @@ function SearchResultsPredictiveCollections({
             trackingParams: collection.trackingParameters,
             term: term.current,
           });
+          const thumbSrc = demoLocal
+            ? pickCollectionCardImage(collection.handle).url
+            : collection.image?.url;
 
           return (
             <li className="predictive-search-result-item" key={collection.id}>
               <Link onClick={closeSearch} to={collectionUrl}>
-                {collection.image?.url && (
+                {thumbSrc ? (
                   <Image
-                    alt={collection.image.altText ?? ''}
-                    src={collection.image.url}
+                    alt={collection.image?.altText ?? collection.title}
+                    src={thumbSrc}
                     width={50}
                     height={50}
                   />
-                )}
+                ) : null}
                 <div>
                   <span>{collection.title}</span>
                 </div>
@@ -200,6 +214,7 @@ function SearchResultsPredictiveProducts({
   products,
   closeSearch,
 }: PartialPredictiveSearchResult<'products'>) {
+  const demoLocal = useLocalDemoMedia();
   if (!products.length) return null;
 
   return (
@@ -215,17 +230,18 @@ function SearchResultsPredictiveProducts({
 
           const price = product?.selectedOrFirstAvailableVariant?.price;
           const image = product?.selectedOrFirstAvailableVariant?.image;
+          const thumbSrc = demoLocal ? pickPoolPath(product.handle, 0) : image?.url;
           return (
             <li className="predictive-search-result-item" key={product.id}>
               <Link to={productUrl} onClick={closeSearch}>
-                {image && (
+                {thumbSrc ? (
                   <Image
-                    alt={image.altText ?? ''}
-                    src={image.url}
+                    alt={image?.altText ?? product.title}
+                    src={thumbSrc}
                     width={50}
                     height={50}
                   />
-                )}
+                ) : null}
                 <div>
                   <p>{product.title}</p>
                   <small>{price && <Money data={price} />}</small>

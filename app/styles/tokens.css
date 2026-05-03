@@ -100,8 +100,9 @@
   --duration-page: 600ms;
 
   --container-max: 1440px;
-  --header-height: 72px;
-  --header-height-compact: 56px;
+  /* Taller bar for 2× logo (h-14 / h-16) + controls */
+  --header-height: 88px;
+  --header-height-compact: 72px;
 }
 
 /* Dark surfaces: ink = light text, paper = deep surface */

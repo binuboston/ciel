@@ -30,6 +30,7 @@ PUBLIC_STORE_DOMAIN = "mock.shop"
 PUBLIC_STOREFRONT_API_TOKEN = "public_demo_token"
 PUBLIC_STOREFRONT_ID = "mock-shop"
 PUBLIC_CHECKOUT_DOMAIN = "mock.shop"
+PUBLIC_USE_LOCAL_DEMO_MEDIA = "true"
 
 # SESSION_SECRET is set as a Wrangler secret (not committed):
 #   npx wrangler secret put SESSION_SECRET

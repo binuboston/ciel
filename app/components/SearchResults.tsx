@@ -1,5 +1,10 @@
 import {Link} from 'react-router';
 import {Image, Money, Pagination} from '@shopify/hydrogen';
+import {
+  pickPoolPath,
+  toSyntheticStorefrontImage,
+  useLocalDemoMedia,
+} from '~/lib/demoLocalMedia';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
 
 type SearchItems = RegularSearchReturn['result']['items'];
@@ -97,6 +102,7 @@ function SearchResultsProducts({
   term,
   products,
 }: PartialSearchResult<'products'>) {
+  const demoLocal = useLocalDemoMedia();
   if (!products?.nodes.length) {
     return null;
   }
@@ -115,13 +121,20 @@ function SearchResultsProducts({
 
             const price = product?.selectedOrFirstAvailableVariant?.price;
             const image = product?.selectedOrFirstAvailableVariant?.image;
+            const imageData = demoLocal
+              ? toSyntheticStorefrontImage(
+                  pickPoolPath(product.handle, 0),
+                  `search-${product.id}`,
+                  product.title,
+                )
+              : image;
 
             return (
               <div className="search-results-item" key={product.id}>
                 <Link prefetch="intent" to={productUrl}>
-                  {image && (
-                    <Image data={image} alt={product.title} width={50} />
-                  )}
+                  {imageData ? (
+                    <Image data={imageData} alt={product.title} width={50} />
+                  ) : null}
                   <div>
                     <p>{product.title}</p>
                     <small>{price && <Money data={price} />}</small>

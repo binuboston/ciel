@@ -6,6 +6,11 @@ import type {
   OrderQuery,
 } from 'customer-accountapi.generated';
 import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
+import {
+  pickPoolPath,
+  toSyntheticStorefrontImage,
+  useLocalDemoMedia,
+} from '~/lib/demoLocalMedia';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `Order ${data?.order?.name}`}];
@@ -195,15 +200,25 @@ export default function OrderRoute() {
 }
 
 function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
+  const demoLocal = useLocalDemoMedia();
+  const imageData =
+    demoLocal && lineItem
+      ? toSyntheticStorefrontImage(
+          pickPoolPath(`${lineItem.title}-${lineItem.id}`, 0),
+          `order-${lineItem.id}`,
+          lineItem.title,
+        )
+      : lineItem.image;
+
   return (
     <tr key={lineItem.id}>
       <td>
         <div>
-          {lineItem?.image && (
+          {imageData ? (
             <div>
-              <Image data={lineItem.image} width={96} height={96} />
+              <Image data={imageData} width={96} height={96} />
             </div>
-          )}
+          ) : null}
           <div>
             <p>{lineItem.title}</p>
             <small>{lineItem.variantTitle}</small>

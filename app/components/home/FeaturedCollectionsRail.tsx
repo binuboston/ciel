@@ -8,6 +8,7 @@ import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
 import {Button} from '~/components/ui/Button';
 import {Skeleton} from '~/components/ui/Skeleton';
+import {pickCollectionCardImage, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 import {cn} from '~/lib/cn';
 import {fadeUp, stagger} from '~/lib/motion';
 
@@ -189,6 +190,11 @@ function RailCard({
   collection: FeaturedCollectionFragment;
   index: number;
 }) {
+  const demoLocal = useLocalDemoMedia();
+  const imageData = demoLocal
+    ? pickCollectionCardImage(collection.handle)
+    : collection.image;
+
   return (
     <Link
       to={`/collections/${collection.handle}`}
@@ -199,10 +205,10 @@ function RailCard({
       )}
     >
       <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-200)] ring-1 ring-[var(--color-neutral-200)] transition-[transform,box-shadow] duration-[var(--duration-base)] ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-within:ring-2 focus-within:ring-[var(--color-ink)]">
-        {collection.image ? (
+        {imageData ? (
           <Image
-            data={collection.image}
-            alt={collection.image.altText || collection.title}
+            data={imageData}
+            alt={collection.image?.altText || collection.title}
             aspectRatio="4/5"
             loading={index < 3 ? 'eager' : 'lazy'}
             sizes="(min-width: 1024px) 32vw, (min-width: 640px) 42vw, 78vw"

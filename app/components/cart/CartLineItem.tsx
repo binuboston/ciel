@@ -5,6 +5,11 @@ import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useUIState} from '~/components/layout/UIStateProvider';
 import {ProductPrice} from '~/components/product/ProductPrice';
+import {
+  pickPoolPath,
+  toSyntheticStorefrontImage,
+  useLocalDemoMedia,
+} from '~/lib/demoLocalMedia';
 import {cn} from '~/lib/cn';
 import {useVariantUrl} from '~/lib/variants';
 
@@ -22,6 +27,10 @@ interface CartLineItemProps {
 export function CartLineItem({line, childrenMap, nested}: CartLineItemProps) {
   const {id, merchandise} = line;
   const {product, title, image, selectedOptions} = merchandise;
+  const demoLocal = useLocalDemoMedia();
+  const resolvedImage = demoLocal
+    ? toSyntheticStorefrontImage(pickPoolPath(product.handle, 0), `cart-${line.id}`, title)
+    : image;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useUIState();
   const lineItemChildren = childrenMap?.[id];
@@ -33,7 +42,7 @@ export function CartLineItem({line, childrenMap, nested}: CartLineItemProps) {
         !nested && 'border-b border-[var(--color-neutral-100)] last:border-b-0',
       )}
     >
-      {image ? (
+      {resolvedImage ? (
         <Link
           to={lineItemUrl}
           onClick={close}
@@ -41,7 +50,7 @@ export function CartLineItem({line, childrenMap, nested}: CartLineItemProps) {
           className="relative block h-24 w-20 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-neutral-100)]"
         >
           <Image
-            data={image}
+            data={resolvedImage}
             alt={title}
             aspectRatio="4/5"
             sizes="80px"

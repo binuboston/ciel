@@ -5,6 +5,13 @@ import {useEffect, useRef} from 'react';
 import {Link} from 'react-router';
 import type {FeaturedCollectionFragment} from 'storefrontapi.generated';
 import {Container} from '~/components/layout/Container';
+import {useHeaderLayout} from '~/components/layout/HeaderLayoutContext';
+import {
+  firstDemoImageUrl,
+  pickCollectionCardImage,
+  toSyntheticStorefrontImage,
+  useLocalDemoMedia,
+} from '~/lib/demoLocalMedia';
 import {Button} from '~/components/ui/Button';
 import {cn} from '~/lib/cn';
 
@@ -18,19 +25,32 @@ interface HeroProps {
   collection?: FeaturedCollectionFragment | null;
   videoSources?: HeroVideoSource[];
   videoPoster?: string;
+  /** Full-bleed hero photo from the site `public/` folder (e.g. `/products/photo.jpg`). Skips video and collection image for the background. */
+  heroImageSrc?: string;
 }
 
 /**
  * Full-bleed hero: optional cinematic video + collection image fallback.
  * Pulled up behind the transparent home header (flush top, no paper gap).
  */
-export function Hero({collection, videoSources, videoPoster}: HeroProps) {
+export function Hero({collection, videoSources, videoPoster, heroImageSrc}: HeroProps) {
+  const {hidden, compact} = useHeaderLayout();
+  const demoLocal = useLocalDemoMedia();
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const image = collection?.image;
-  const hasVideo = !!videoSources?.length;
+  const useStaticHero = Boolean(heroImageSrc);
+  const image = useStaticHero
+    ? null
+    : demoLocal
+      ? collection
+        ? pickCollectionCardImage(collection.handle)
+        : toSyntheticStorefrontImage(firstDemoImageUrl(), 'hero-default', 'CIEL')
+      : collection?.image ?? null;
+  const hasVideo = !!videoSources?.length && !demoLocal && !useStaticHero;
   const showVideo = hasVideo && !reduceMotion;
-  const posterFallback = videoPoster || image?.url;
+  const posterFallback =
+    videoPoster ||
+    (useStaticHero ? heroImageSrc : demoLocal ? firstDemoImageUrl() : image?.url);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -47,8 +67,13 @@ export function Hero({collection, videoSources, videoPoster}: HeroProps) {
       className={cn(
         'surface-dark relative isolate overflow-hidden',
         'flex items-end',
-        '[margin-top:calc(var(--header-height)*-1)]',
-        '[min-height:calc(100svh+var(--header-height))]',
+        hidden && 'mt-0 min-h-svh',
+        !hidden &&
+          !compact &&
+          '[margin-top:calc(var(--header-height)*-1)] [min-height:calc(100svh+var(--header-height))]',
+        !hidden &&
+          compact &&
+          '[margin-top:calc(var(--header-height-compact)*-1)] [min-height:calc(100svh+var(--header-height-compact))]',
       )}
     >
       {showVideo ? (
@@ -76,6 +101,14 @@ export function Hero({collection, videoSources, videoPoster}: HeroProps) {
             />
           ))}
         </motion.video>
+      ) : useStaticHero && heroImageSrc ? (
+        <img
+          src={heroImageSrc}
+          alt={collection?.title ? `Hero · ${collection.title}` : 'Hero'}
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
       ) : image ? (
         <Image
           data={image}

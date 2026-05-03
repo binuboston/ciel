@@ -7,6 +7,7 @@ import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
 import {Skeleton} from '~/components/ui/Skeleton';
+import {pickCollectionCardImage, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 import {fadeUp, stagger} from '~/lib/motion';
 
 interface RecommendedProductsProps {
@@ -90,13 +91,18 @@ function CollectionCard({
   collection: FeaturedCollectionFragment;
   priority?: boolean;
 }) {
+  const demoLocal = useLocalDemoMedia();
+  const imageData = demoLocal
+    ? pickCollectionCardImage(collection.handle)
+    : collection.image;
+
   return (
     <Link to={`/collections/${collection.handle}`} prefetch="intent" className="group flex flex-col gap-4">
       <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-neutral-200)]">
-        {collection.image ? (
+        {imageData ? (
           <Image
-            data={collection.image}
-            alt={collection.image.altText || collection.title}
+            data={imageData}
+            alt={collection.image?.altText || collection.title}
             aspectRatio="4/5"
             loading={priority ? 'eager' : 'lazy'}
             sizes="(min-width: 1200px) 25vw, (min-width: 768px) 40vw, 100vw"

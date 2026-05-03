@@ -1,6 +1,7 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
+import {pickArticleCardImage, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -67,7 +68,9 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export default function Article() {
   const {article} = useLoaderData<typeof loader>();
+  const demoLocal = useLocalDemoMedia();
   const {title, image, contentHtml, author} = article;
+  const imageData = demoLocal ? pickArticleCardImage(article.handle) : image;
 
   const publishedDate = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
@@ -85,7 +88,7 @@ export default function Article() {
         </div>
       </h1>
 
-      {image && <Image data={image} sizes="90vw" loading="eager" />}
+      {imageData ? <Image data={imageData} sizes="90vw" loading="eager" /> : null}
       <div
         dangerouslySetInnerHTML={{__html: contentHtml}}
         className="article"

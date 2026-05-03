@@ -92,6 +92,17 @@ Local values live in **`.env`**. Production values live in **`wrangler.toml`**
 | `PUBLIC_STOREFRONT_API_TOKEN`  | ✅       | Storefront API access token from a Custom App. Any string for `mock.shop`. |
 | `PUBLIC_STOREFRONT_ID`         | ✅       | Storefront analytics ID. Placeholder string is fine in mock mode. |
 | `PUBLIC_CHECKOUT_DOMAIN`       | ✅       | Domain used for checkout (usually same as store domain).     |
+| `PUBLIC_USE_LOCAL_DEMO_MEDIA`  | ⬜       | When `true` / `1` / `yes`, product, collection, cart, search, and blog **images** use files listed in [`app/lib/demoLocalMedia.ts`](app/lib/demoLocalMedia.ts) under `public/products/` instead of Shopify CDN URLs. Titles and prices still come from the Storefront API. |
+| `PUBLIC_DEMO_COLLECTION_HANDLES` | ⬜     | Optional comma-separated collection **handles** (must exist in the store). When set with local demo media, the homepage deferred collections list is **filtered** to only those handles. |
+
+### Local demo photos only (`public/products/`)
+
+1. Add or replace JPEGs in **`public/products/`** (any filenames).
+2. Update the ordered array **`DEMO_LOCAL_PRODUCT_IMAGE_PATHS`** in [`app/lib/demoLocalMedia.ts`](app/lib/demoLocalMedia.ts) so it lists every file you want in the rotation (Workers cannot scan the folder at runtime).
+3. Set **`PUBLIC_USE_LOCAL_DEMO_MEDIA=true`** in `.env` (and `wrangler.toml` `[vars]` for production) to activate overrides.
+4. Optionally set **`PUBLIC_DEMO_COLLECTION_HANDLES`** to limit which collections appear on the home page when using mock data.
+
+On the home hero, **remote hero video is disabled** in local-demo mode so the fold does not depend on Shopify-hosted video; the poster uses your first local image.
 
 Current `.env` is preconfigured for `mock.shop`. **Never commit `.env`** —
 it's in `.gitignore`.

@@ -1,4 +1,5 @@
 import {useLoaderData} from 'react-router';
+import {parseDemoCollectionHandles} from '~/lib/demoLocalMedia';
 import type {Route} from './+types/_index';
 import {FeaturedCollection} from '~/components/home/FeaturedCollection';
 import {FeaturedCollectionsRail} from '~/components/home/FeaturedCollectionsRail';
@@ -38,8 +39,14 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
+  const filter = parseDemoCollectionHandles(context.env);
   const recommendedCollections = context.storefront
     .query(RECOMMENDED_COLLECTIONS_QUERY)
+    .then((res) => {
+      if (!res?.collections?.nodes?.length || !filter?.length) return res;
+      const nodes = res.collections.nodes.filter((c) => filter.includes(c.handle));
+      return {...res, collections: {...res.collections, nodes}};
+    })
     .catch((error: Error) => {
       console.error(error);
       return null;
@@ -68,6 +75,7 @@ export default function Homepage() {
       <Hero
         collection={data.featuredCollection}
         videoSources={HERO_VIDEO_SOURCES}
+        heroImageSrc="/products/a165be30ab114e0b5f9d94763bb97d5c.jpg"
       />
       <MarqueeBar />
       <RecommendedProducts products={data.recommendedCollections} />

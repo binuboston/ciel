@@ -8,6 +8,10 @@ import {Footer} from '~/components/footer/Footer';
 import {Header} from '~/components/header/Header';
 import {MobileMenuDrawer} from '~/components/header/MobileMenuDrawer';
 import {SearchDrawer} from '~/components/header/SearchDrawer';
+import {
+  HeaderLayoutProvider,
+  HeaderSpacer,
+} from '~/components/layout/HeaderLayoutContext';
 import {UIStateProvider} from './UIStateProvider';
 
 interface PageLayoutProps {
@@ -29,29 +33,33 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <UIStateProvider>
-      <div className="flex min-h-svh flex-col bg-[var(--color-paper)] text-[var(--color-ink)]">
-        {header ? (
-          <Header
+      <HeaderLayoutProvider>
+        <div className="flex min-h-svh flex-col bg-[var(--color-paper)] text-[var(--color-ink)]">
+          {header ? (
+            <Header
+              header={header}
+              cart={cart}
+              isLoggedIn={isLoggedIn}
+              publicStoreDomain={publicStoreDomain}
+            />
+          ) : null}
+
+          {header ? <HeaderSpacer /> : null}
+
+          <main className="flex-1">{children}</main>
+
+          <Footer
+            footer={footer}
             header={header}
-            cart={cart}
-            isLoggedIn={isLoggedIn}
             publicStoreDomain={publicStoreDomain}
           />
-        ) : null}
 
-        <main className="flex-1">{children}</main>
-
-        <Footer
-          footer={footer}
-          header={header}
-          publicStoreDomain={publicStoreDomain}
-        />
-
-        {/* Global drawers */}
-        <CartDrawer cart={cart} />
-        <MobileMenuDrawer header={header} publicStoreDomain={publicStoreDomain} />
-        <SearchDrawer />
-      </div>
+          {/* Global drawers */}
+          <CartDrawer cart={cart} />
+          <MobileMenuDrawer header={header} publicStoreDomain={publicStoreDomain} />
+          <SearchDrawer />
+        </div>
+      </HeaderLayoutProvider>
     </UIStateProvider>
   );
 }

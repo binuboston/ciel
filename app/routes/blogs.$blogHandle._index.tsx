@@ -5,6 +5,7 @@ import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {pickArticleCardImage, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import type {Route} from './+types/blogs.$blogHandle._index';
 
@@ -109,6 +110,10 @@ function ArticleItem({
   article: ArticleItemFragment;
   loading?: HTMLImageElement['loading'];
 }) {
+  const demoLocal = useLocalDemoMedia();
+  const imageData = demoLocal
+    ? pickArticleCardImage(article.handle)
+    : article.image;
   const publishedAt = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -119,12 +124,12 @@ function ArticleItem({
       to={`/blogs/${article.blog.handle}/${article.handle}`}
       className="group block rounded-[var(--radius-2xl)] border border-[var(--color-neutral-200)] bg-[var(--color-paper)] p-4 transition-colors hover:border-[var(--color-neutral-400)]"
     >
-      {article.image ? (
+      {imageData ? (
         <div className="overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-neutral-100)]">
           <Image
-            alt={article.image.altText || article.title}
+            alt={article.image?.altText || article.title}
             aspectRatio="3/2"
-            data={article.image}
+            data={imageData}
             loading={loading}
             sizes="(min-width: 768px) 50vw, 100vw"
             className="h-full w-full object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-expo)] group-hover:scale-[1.02]"

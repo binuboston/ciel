@@ -1,9 +1,10 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
 import {Menu, Search, ShoppingBag, User} from 'lucide-react';
-import {Suspense, useEffect, useState} from 'react';
+import {Suspense} from 'react';
 import {Await, NavLink, useAsyncValue, useLocation} from 'react-router';
 import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
 import {Container} from '~/components/layout/Container';
+import {useHeaderLayout} from '~/components/layout/HeaderLayoutContext';
 import {useUIState} from '~/components/layout/UIStateProvider';
 import {IconButton} from '~/components/ui/IconButton';
 import {Logo} from '~/components/ui/Logo';
@@ -20,44 +21,59 @@ interface HeaderProps {
 
 export function Header({header, cart, isLoggedIn, publicStoreDomain}: HeaderProps) {
   const {shop, menu} = header;
-  const scrolled = useScrolled(8);
+  const {hidden, compact, reduceMotion} = useHeaderLayout();
   const {pathname} = useLocation();
   const isHome = pathname === '/';
 
   return (
     <header
-      data-scrolled={scrolled}
+      data-scrolled={compact}
       data-home={isHome}
+      data-hidden={hidden}
       className={cn(
-        'sticky top-0 z-40 w-full transition-[background,box-shadow,height,color]',
-        'duration-[var(--duration-base)] ease-[var(--ease-out-expo)]',
-        scrolled
+        'fixed inset-x-0 z-40 w-full',
+        !compact && isHome ? 'top-0 md:top-16' : 'top-0',
+        reduceMotion
+          ? 'transition-none'
+          : 'transition-[transform,top,background-color,box-shadow,color] duration-[var(--duration-base)] ease-[var(--ease-out-expo)] will-change-transform',
+        hidden && '-translate-y-full pointer-events-none',
+        !hidden && 'translate-y-0',
+        compact
           ? 'h-[var(--header-height-compact)] surface-glass shadow-[0_1px_0_var(--color-neutral-100)]'
           : 'h-[var(--header-height)] bg-[var(--color-paper)]',
-        !scrolled && isHome && 'bg-transparent text-[var(--color-paper)]',
+        !compact && isHome && 'bg-transparent text-[var(--color-paper)]',
       )}
     >
-      <Container className="flex h-full items-center justify-between gap-6">
+      <Container className="flex h-full w-full items-center justify-between gap-3 md:gap-6">
+        <div
+          className={cn(
+            'flex w-max min-w-0 items-center gap-3 overflow-x-auto md:gap-6',
+            '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+            'border-y border-[var(--color-neutral-200)] py-2',
+            !compact && isHome && 'border-white/25',
+          )}
+          data-header-nav-group
+        >
+          <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+          <MegaMenu
+            menu={menu}
+            primaryDomainUrl={shop.primaryDomain?.url}
+            publicStoreDomain={publicStoreDomain}
+          />
+        </div>
+
         <NavLink
           to="/"
           prefetch="intent"
           end
           aria-label={shop.name}
-          className="inline-flex items-center"
+          className="inline-flex shrink-0 items-center pl-2"
         >
           <Logo
             decorative
-            className="h-7 w-auto md:h-8 transition-[height] duration-[var(--duration-base)]"
+            className="h-14 w-auto md:h-16 transition-[height] duration-[var(--duration-base)]"
           />
         </NavLink>
-
-        <MegaMenu
-          menu={menu}
-          primaryDomainUrl={shop.primaryDomain?.url}
-          publicStoreDomain={publicStoreDomain}
-        />
-
-        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
       </Container>
     </header>
   );
@@ -140,26 +156,6 @@ function CartBadge() {
       <ShoppingBag className="h-5 w-5" strokeWidth={1.8} />
     </IconButton>
   );
-}
-
-function useScrolled(threshold = 8) {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        setScrolled(window.scrollY > threshold);
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, {passive: true});
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, [threshold]);
-  return scrolled;
 }
 
 export function HeaderMenu({

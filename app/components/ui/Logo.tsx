@@ -31,10 +31,11 @@ export const Logo = forwardRef<SVGSVGElement, LogoProps>(function Logo(
   return (
     <svg
       ref={ref}
-      viewBox="0 0 1080 488.44"
+      viewBox="77.01 79.2 925.98 330.2"
+      preserveAspectRatio="xMinYMid meet"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn('inline-block', className)}
+      className={cn('block', className)}
       {...a11yProps}
       {...rest}
     >

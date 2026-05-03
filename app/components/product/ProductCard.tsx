@@ -2,6 +2,7 @@ import {Money} from '@shopify/hydrogen';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
 import {Link} from 'react-router';
 import {HoverImageSwap} from '~/components/motion/HoverImageSwap';
+import {pickProductCardImages, useLocalDemoMedia} from '~/lib/demoLocalMedia';
 import {cn} from '~/lib/cn';
 import {useVariantUrl} from '~/lib/variants';
 
@@ -48,8 +49,13 @@ export function ProductCard({
   eyebrow,
 }: ProductCardProps) {
   const variantUrl = useVariantUrl(product.handle);
-  const primary = product.featuredImage ?? null;
-  const secondary = product.images?.nodes?.[1] ?? null;
+  const demoLocal = useLocalDemoMedia();
+  const {primary, secondary} = demoLocal
+    ? pickProductCardImages(product.handle)
+    : {
+        primary: product.featuredImage ?? null,
+        secondary: product.images?.nodes?.[1] ?? null,
+      };
 
   const compareAtPrice = product.compareAtPriceRange?.minVariantPrice ?? null;
   const onSale =

@@ -7,7 +7,8 @@ import {
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
 import {Truck, Undo2} from 'lucide-react';
-import {useLoaderData} from 'react-router';
+import {useMemo} from 'react';
+import {useLoaderData, useRouteLoaderData} from 'react-router';
 import {Container} from '~/components/layout/Container';
 import {Section} from '~/components/layout/Section';
 import {ScrollReveal} from '~/components/motion/ScrollReveal';
@@ -20,6 +21,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '~/components/ui/Accordion';
+import {pickGallerySyntheticImages} from '~/lib/demoLocalMedia';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import type {Route} from './+types/products.$handle';
 
@@ -66,6 +68,7 @@ function loadDeferredData(_: Route.LoaderArgs) {
 
 export default function Product() {
   const {product} = useLoaderData<typeof loader>();
+  const root = useRouteLoaderData('root') as {useLocalDemoMedia?: boolean} | undefined;
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -83,13 +86,23 @@ export default function Product() {
 
   // Build a gallery: prefer the full images list, but always lead with the
   // selected variant's image so changing color/size visibly reflects up top.
-  const galleryImages = (() => {
+  const galleryImages = useMemo(() => {
+    if (root?.useLocalDemoMedia) {
+      const count = product.images?.nodes?.length ?? 0;
+      const want = Math.min(10, Math.max(4, count || 4));
+      return pickGallerySyntheticImages(product.handle, want);
+    }
     const all = product.images?.nodes ?? [];
     const selected = selectedVariant?.image;
     if (!selected) return all;
     const filtered = all.filter((img: {id?: string | null}) => img && img.id !== selected.id);
     return [selected, ...filtered];
-  })();
+  }, [
+    root?.useLocalDemoMedia,
+    product.handle,
+    product.images?.nodes,
+    selectedVariant?.image,
+  ]);
 
   return (
     <>
